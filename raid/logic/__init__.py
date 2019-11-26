@@ -2,7 +2,7 @@ import discord
 from raid.logic.discord_parsers import MessageParser
 
 client = discord.Client()
-parser = MessageParser()
+parser = MessageParser(client)
 
 @client.event
 async def on_ready():
@@ -12,10 +12,13 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-
-    if message.content.startswith('%raid'):
+    if message.content.startswith('%raid post allotment'):
+        response_msg = await parser.send_allotment(message)
+        await message.channel.send(response_msg)
+    elif message.content.startswith('%raid'):
         response = parser.parse_command(message)
         await message.channel.send(response)
 
 def init(options):
+    parser.set_datasource(options.datasource.strip())
     client.run(options.token.strip())
