@@ -55,12 +55,14 @@ class Operators:
       Bank Percent: {}
       Split allotment: {}
       Reporting Channel: {}
+      Command Channel: {}
       {}
       """.format(
         self.kingdom.kingdom_name,
         self.kingdom.bank_pct,
         self.kingdom.split_allotment,
         self.kingdom.channel,
+        self.kingdom.command_channel,
         self._dump_pct_table("Raid allotment Distribution:", self.kingdom.allotment_distribution)
       ))
 
@@ -74,6 +76,16 @@ class Operators:
       self.kingdom.set_channel(channel)
       self.kingdom.save()
       return "Setting #{} as the reporting channel".format(channel)
+    
+    def set_command_channel(self, channel):
+      self.kingdom.set_command_channel(channel)
+      self.kingdom.save()
+      return "Setting #{} as the command channel".format(channel)
+
+    def set_allotment_header(self, header):
+      self.kingdom.set_allotment_header(header)
+      self.kingdom.save()
+      return "Setting the following as the allotment header:\n{}".format(header)
     
     def set_allotment(self, allotment_pcts):
       

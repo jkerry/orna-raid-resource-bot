@@ -13,10 +13,14 @@ async def on_message(message):
     if message.author == client.user:
         return
     if message.content.startswith('%raid post allotment'):
-        response_msg = await parser.send_allotment(message)
-        await message.channel.send(response_msg)
+        response = await parser.send_allotment(message)
+        if response is None:
+            return response
+        await message.channel.send(response)
     elif message.content.startswith('%raid'):
         response = parser.parse_command(message)
+        if response is None:
+            return response
         await message.channel.send(response)
 
 def init(options):

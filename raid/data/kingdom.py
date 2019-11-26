@@ -25,7 +25,8 @@ class Kingdom:
             self._load_or_default_split_allotment()
             self._load_or_default_allotment_distribution()
             self._load_or_default_channel()
-            self._load_or_default_allotment_header
+            self._load_or_default_command_channel()
+            self._load_or_default_allotment_header()
             return self
         else:
             return None
@@ -37,6 +38,7 @@ class Kingdom:
         self.data['kingdom_name'] = self.kingdom_name
         self.data['allotment_distribution'] = self.allotment_distribution
         self.data['channel'] = self.channel
+        self.data['command_channel'] = self.command_channel
         self.data['allotment_header'] = self.allotment_header
         result = self.db.kingdoms.replace_one({'id': self.kingdom_id}, self.data, upsert=True)
         self.needs_persistance = False
@@ -49,8 +51,13 @@ class Kingdom:
             return True
         return False
     
-    def set_allotment_msg_ids(self, allotment_header):
+    def set_allotment_header(self, allotment_header):
         self.allotment_header = allotment_header
+        return True
+
+    def set_command_channel(self, command_channel):
+        self.command_channel = command_channel
+        self.needs_persistance = True
         return True
 
     def set_channel(self, channel):
@@ -88,6 +95,12 @@ class Kingdom:
             self.data['allotment_distribution'] = [0,0,0,0,0,40,50,10]
             self.needs_persistance = True
         self.allotment_distribution = self.data['allotment_distribution']
+
+    def _load_or_default_command_channel(self):
+        if 'command_channel' not in self.data:
+            self.data['command_channel'] = None
+            self.needs_persistance = True
+        self.command_channel = self.data['command_channel']
 
     def _load_or_default_channel(self):
         if 'channel' not in self.data:
