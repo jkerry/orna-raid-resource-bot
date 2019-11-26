@@ -10,7 +10,7 @@ class MessageParser:
     configure_command_channel_pattern = re.compile(r'configure command channel\s*(\S+)')
     configure_header_pattern = re.compile(r'configure header\s*(.*)')
     configure_allotment_pattern = re.compile(r'configure allotment\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)')
-    configure_raid_emoji = re.compile(r'configure emoji\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)')
+    configure_emoji_pattern = re.compile(r'configure emoji\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)')
     configure_bank_pattern = re.compile(r'configure bank\s*(\d+)')
     configure_post_allotment_pattern = re.compile(r'post allotment\s*(\d+)')
     configure_split_pattern = re.compile(r'configure split\s*([TtrueFfals]+)')
@@ -93,7 +93,7 @@ class MessageParser:
         if msg_channel is None:
             return "failed to identify kingdom announcement channel!"
         # calculate the current orn distributions
-        command_text = message.content.replace('%raid','').strip()
+        command_text = message.content.replace('%raid','').strip().replace(',','')
         match = self.configure_post_allotment_pattern.match(command_text)
         values = []
         if not match:
@@ -108,19 +108,20 @@ class MessageParser:
         allotment_metadata['timestamp'] = datetime.utcnow()
         message_ids = []
         header_msg = await msg_channel.send(kingdom.allotment_header)
-        message_ids.append(header_msg.id)
+        message_ids.append(header_msg.id)     
         bosses = [
-            "<:dracon:648761031400882177> Dracon",
-            "<:fomor:648761066666590229> Fomor",
-            "<:starlord:648761098777919498> Starlord",
-            "<:titan:648761098790502410> Titan",
-            "<:balor_knight:648761098648027156> Balor Elite",
-            "<:king_arthus:648761098941628427> King Arthus",
-            "<:apollyon:648761098794696713> Apollyon",
-            ":calendar: Monthly Raid"
+            "Dracon",
+            "Fomor",
+            "Starlord",
+            "Titan",
+            "Balor Elite",
+            "King Arthus",
+            "Apollyon",
+            "Monthly Raid"
         ]
+        emoji = kingdom.emoji
         for i in range(8):
-            message_ids.append(await self._send_allotment_and_get_id(msg_channel, bosses[i], allotment[i]))
+            message_ids.append(await self._send_allotment_and_get_id(msg_channel, "{} {}".format(emoji[i], bosses[i]), allotment[i]))
         return "Allotment Sent!"
 
     async def _send_allotment_and_get_id(self, channel, boss, allotment):
@@ -144,13 +145,21 @@ class MessageParser:
             return operators.show_configuration()
         elif command_text.startswith('configure allotment'):
             match = self.configure_allotment_pattern.match(command_text)
-            if match:
+            if len(command_text.split()) is 10 and match:
                 values = match.groups()
                 return operators.set_allotment(values)
             else:
                 return 'Unable to parse the command. Expected 8 percentage ' + \
                 'values totaling to 100:\n`%raid configure allotment' + \
                 ' 0 0 0 10 15 25 25 0`'
+        elif command_text.startswith('configure emoji'):
+            match = self.configure_emoji_pattern.match(command_text)
+            if len(command_text.split()) is 10 and match:
+                values = match.groups()
+                return operators.set_emoji(values)
+            else:
+                return 'Unable to parse the command. Expected 8 emoji tags.' + \
+                    '%raid configure emoji <:dracon:648761031400882177> <:fomor:648761066666590229> ...'
         elif command_text.startswith('configure bank'):
             match = self.configure_bank_pattern.match(command_text)
             if match:

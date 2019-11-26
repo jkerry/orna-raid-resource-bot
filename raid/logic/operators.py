@@ -88,7 +88,6 @@ class Operators:
       return "Setting the following as the allotment header:\n{}".format(header)
     
     def set_allotment(self, allotment_pcts):
-      
       if not self._validate_allotment_percentages(allotment_pcts):
         return self._dump_pct_table(":exclamation: The values provided do not sum to 100:", allotment_pcts)
       # Save the percents to kingdom data
@@ -96,3 +95,10 @@ class Operators:
         self.kingdom.save()
         return self._dump_pct_table(":white_check_mark: Saving the following configuration:", allotment_pcts)
       return self._dump_pct_table(":exclamation: There was an error validating or saving the following values:", allotment_pcts)
+
+    def set_emoji(self, emojis):
+      # Save the percents to kingdom data
+      if self.kingdom.set_emoji(emojis):
+        self.kingdom.save()
+        return "Raid emoji persisted: {}".format(emojis)
+      return self._dump_pct_table(":exclamation: There was an error validating or saving the following values:", emojis)

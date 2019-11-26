@@ -27,6 +27,7 @@ class Kingdom:
             self._load_or_default_channel()
             self._load_or_default_command_channel()
             self._load_or_default_allotment_header()
+            self._load_or_default_emoji()
             return self
         else:
             return None
@@ -40,6 +41,7 @@ class Kingdom:
         self.data['channel'] = self.channel
         self.data['command_channel'] = self.command_channel
         self.data['allotment_header'] = self.allotment_header
+        self.data['emoji'] = self.emoji
         result = self.db.kingdoms.replace_one({'id': self.kingdom_id}, self.data, upsert=True)
         self.needs_persistance = False
         print("Updated {} records.".format(result.modified_count))
@@ -50,7 +52,12 @@ class Kingdom:
             self.needs_persistance = True
             return True
         return False
-    
+
+    def set_emoji(self, emojis):
+        self.emoji = emojis
+        self.needs_persistance = True
+        return True
+
     def set_allotment_header(self, allotment_header):
         self.allotment_header = allotment_header
         return True
@@ -95,6 +102,12 @@ class Kingdom:
             self.data['allotment_distribution'] = [0,0,0,0,0,40,50,10]
             self.needs_persistance = True
         self.allotment_distribution = self.data['allotment_distribution']
+    
+    def _load_or_default_emoji(self):
+        if not ('emoji' in self.data):
+            self.data['emoji'] = [":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":calendar:"]
+            self.needs_persistance = True
+        self.emoji = self.data['emoji']
 
     def _load_or_default_command_channel(self):
         if 'command_channel' not in self.data:
