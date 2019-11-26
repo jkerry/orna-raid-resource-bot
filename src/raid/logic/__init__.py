@@ -24,5 +24,7 @@ async def on_message(message):
         await message.channel.send(response)
 
 def init(options):
+    print("initializing parser..")
     parser.set_datasource(options.datasource.strip())
+    print ("launching discord client..")
     client.run(options.token.strip())

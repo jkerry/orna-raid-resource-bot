@@ -21,16 +21,14 @@ class Kingdom:
         result = self.db.kingdoms.find_one({'id': self.kingdom_id})
         if result is not None:
             self.data = result
-            self._load_or_default_bank_pct()
-            self._load_or_default_split_allotment()
-            self._load_or_default_allotment_distribution()
-            self._load_or_default_channel()
-            self._load_or_default_command_channel()
-            self._load_or_default_allotment_header()
-            self._load_or_default_emoji()
-            return self
-        else:
-            return None
+        self._load_or_default_bank_pct()
+        self._load_or_default_split_allotment()
+        self._load_or_default_allotment_distribution()
+        self._load_or_default_channel()
+        self._load_or_default_command_channel()
+        self._load_or_default_allotment_header()
+        self._load_or_default_emoji()
+        return self
 
     def save(self):
         self.data['bank_pct'] = self.bank_pct
@@ -139,7 +137,7 @@ class Kingdom:
 
     def _allotment_distribution_is_valid(self, allotment_pcts):
         total = 0
-        if len(allotment_pcts) is not 8:
+        if len(allotment_pcts) != 8:
             return False
         for value in allotment_pcts:
             total += int(value)
