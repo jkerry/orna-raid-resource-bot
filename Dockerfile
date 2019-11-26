@@ -4,4 +4,4 @@ RUN apk add --update alpine-sdk
 RUN pip install -r /requirements.txt
 COPY src/ /app
 WORKDIR /app
-CMD ["python3", "/app/main.py"]
+CMD ["python3", "-u", "/app/main.py"]
