@@ -59,7 +59,7 @@ class MessageParser:
                 -- example: %raid configure command channel officers
             
             post allotment :: remove posts from the allotment channel and post a new allotment
-                -- example: %raid post allotment
+                -- example: %raid post allotment 189000
             ```
         """)
 
