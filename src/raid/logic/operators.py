@@ -52,7 +52,9 @@ class Operators:
     def show_configuration(self):
       return inspect.cleandoc("""
       {} Raid Configuration:
-      Bank Percent: {}
+      Bank Total: {}
+      Bank Target: {}
+      Bank Hold: {}
       Split allotment: {}
       Reporting Channel: {}
       Command Channel: {}
@@ -60,7 +62,9 @@ class Operators:
       {}
       """.format(
         self.kingdom.kingdom_name,
-        self.kingdom.bank_pct,
+        self.kingdom.bank_total,
+        self.kingdom.bank_target,
+        self.kingdom.bank_hold,
         self.kingdom.split_allotment,
         self.kingdom.channel,
         self.kingdom.command_channel,
