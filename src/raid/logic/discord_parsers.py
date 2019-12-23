@@ -69,7 +69,7 @@ class MessageParser:
     def _get_allotment(self, bank_pct, allotment_distribution, orns):
         allotments = []
         usable_orns = math.floor(orns * (1.0 - bank_pct))
-        raid_costs = [910,910,1410,1910,2500,3000,5500,3000]
+        raid_costs = [910,910,1410,1910,2500,3000,5500,4800]
         for i in range(8):
             dist = allotment_distribution[i] / 100.0
             allotments.append(math.floor(dist * usable_orns / raid_costs[i]))

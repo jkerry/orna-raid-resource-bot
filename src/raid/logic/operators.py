@@ -56,6 +56,7 @@ class Operators:
       Split allotment: {}
       Reporting Channel: {}
       Command Channel: {}
+      Current Monthly Raid Cost: 4800
       {}
       """.format(
         self.kingdom.kingdom_name,
