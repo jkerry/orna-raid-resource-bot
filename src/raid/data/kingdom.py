@@ -115,7 +115,7 @@ class Kingdom:
     def _bank_hold_is_valid(self, bank_hold):
         return bank_hold is not None and \
             isinstance(bank_hold, int) and \
-            bank_hold >= 0 and bank_hold <= 100
+            bank_hold >= 0
 
     def _load_or_default_allotment_header(self):
         if 'allotment_header' not in self.data:
