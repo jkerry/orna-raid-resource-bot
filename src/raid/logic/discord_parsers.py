@@ -11,7 +11,12 @@ class MessageParser:
     configure_header_pattern = re.compile(r'configure header\s*(.*)')
     configure_allotment_pattern = re.compile(r'configure allotment\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)')
     configure_emoji_pattern = re.compile(r'configure emoji\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)')
-    configure_bank_pattern = re.compile(r'configure bank\s*(\d+)')
+
+    # Bank Commands
+    configure_bank_target_pattern = re.compile(r'configure bank target\s*(\d+)')
+    configure_bank_total_pattern = re.compile(r'configure bank total\s*(\d+)')
+    configure_bank_hold_pattern = re.compile(r'configure bank hold\s*(\d+)')
+
     configure_post_allotment_pattern = re.compile(r'post allotment\s*(\d+)')
     configure_split_pattern = re.compile(r'configure split\s*([TtrueFfals]+)')
     allocate_pattern = re.compile(r'allocate\s*(\d+)')
@@ -28,9 +33,7 @@ class MessageParser:
     def validate_allotment_percentages(self, values):
         total = 0
         for value in values:
-            print(total)
             total += int(value)
-        print(total)
         return total == 100
 
     def help(self):
@@ -46,8 +49,14 @@ class MessageParser:
             configure emoji :: configures the raid emoji. IDs are unique per server. Monthly raid is last.
                 -- example: %raid configure emoji <:dracon:648761031400882177> <:fomor:648761066666590229> ...
             
-            configure bank :: configures the percent per allocation to reserve
-                -- example: %raid configure bank 10
+            configure bank total :: configures the total held bank orns
+                -- example: %raid configure bank total 1000000
+            
+            configure bank target :: configures the amount of orns the kingdom is targeting while in savings mode
+                -- example: %raid configure bank target 1500000
+            
+            configure bank hold :: configures the amount of orns to hold in reserve per allocation towards the target
+                -- example: %raid configure bank hold 50000
             
             configure header :: set the header message for raid allotments
                 -- example: %raid configure header This appears at the top of an allotment
@@ -66,13 +75,29 @@ class MessageParser:
     def try_load_data(self, kingdom_id, kingdom_name):
         return Kingdom(self.datasource, kingdom_id, kingdom_name)
 
-    def _get_allotment(self, bank_pct, allotment_distribution, orns):
+    def _get_allotment(self, kingdom, orns):
         allotments = []
-        usable_orns = math.floor(orns * (1.0 - bank_pct))
+        bank_total = kingdom.bank_total
+        bank_target = kingdom.bank_target
+        bank_hold = kingdom.bank_hold
+        allotment_distribution = kingdom.allotment_distribution
+        orns_gained = orns - bank_total
+        usable_orns = orns_gained
+        if bank_total < bank_target:
+            usable_orns = usable_orns - bank_hold
         raid_costs = [910,910,1410,1910,2500,3000,5500,4800]
+        if orns_gained < 0 or usable_orns < 0:
+            kingdom.set_bank_total(orns)
+            kingdom.save()
+            return [0]*8
+
         for i in range(8):
             dist = allotment_distribution[i] / 100.0
             allotments.append(math.floor(dist * usable_orns / raid_costs[i]))
+        
+        if bank_total < bank_target:
+            kingdom.set_bank_total(bank_total+bank_hold)
+            kingdom.save()
         return allotments
 
     def _allowed_command_channel(self, allowed_channel, channel):
@@ -99,7 +124,7 @@ class MessageParser:
         if not match:
             return False
         values = match.groups()
-        allotment = self._get_allotment(int(kingdom.bank_pct)/100.0, kingdom.allotment_distribution, int(values[0]))
+        allotment = self._get_allotment(kingdom, int(values[0]))
 
         # delete old messages
         await msg_channel.purge()
@@ -160,14 +185,30 @@ class MessageParser:
             else:
                 return 'Unable to parse the command. Expected 8 emoji tags.' + \
                     '%raid configure emoji <:dracon:648761031400882177> <:fomor:648761066666590229> ...'
-        elif command_text.startswith('configure bank'):
-            match = self.configure_bank_pattern.match(command_text)
+        elif command_text.startswith('configure bank target'):
+            match = self.configure_bank_target_pattern.match(command_text)
             if match:
                 values = match.groups()
-                return operators.set_bank(values[0])
+                return operators.set_bank_target(values[0])
             else:
-                return 'Unable to parse the command. Expected a percentage ' + \
-                'value between 0 and 100:\n`%raid configure bank 15'
+                return 'Unable to parse the command. Expected an orn value ' + \
+                'greater than 0:\n`%raid configure bank total 900000'
+        elif command_text.startswith('configure bank total'):
+            match = self.configure_bank_total_pattern.match(command_text)
+            if match:
+                values = match.groups()
+                return operators.set_bank_total(values[0])
+            else:
+                return 'Unable to parse the command. Expected an orn value ' + \
+                'greater than 0:\n`%raid configure bank target 1500000'
+        elif command_text.startswith('configure bank hold'):
+            match = self.configure_bank_hold_pattern.match(command_text)
+            if match:
+                values = match.groups()
+                return operators.set_bank_hold(values[0])
+            else:
+                return 'Unable to parse the command. Expected an orn value ' + \
+                'greater than 0:\n`%raid configure bank hold 50000'
         elif command_text.startswith('configure channel'):
             match = self.configure_channel_pattern.match(command_text)
             if match:
