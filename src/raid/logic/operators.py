@@ -52,7 +52,9 @@ class Operators:
     def show_configuration(self):
       return inspect.cleandoc("""
       {} Raid Configuration:
-      Bank Percent: {}
+      Bank Total: {}
+      Bank Target: {}
+      Bank Hold: {}
       Split allotment: {}
       Reporting Channel: {}
       Command Channel: {}
@@ -60,18 +62,32 @@ class Operators:
       {}
       """.format(
         self.kingdom.kingdom_name,
-        self.kingdom.bank_pct,
+        self.kingdom.bank_total,
+        self.kingdom.bank_target,
+        self.kingdom.bank_hold,
         self.kingdom.split_allotment,
         self.kingdom.channel,
         self.kingdom.command_channel,
         self._dump_pct_table("Raid allotment Distribution:", self.kingdom.allotment_distribution)
       ))
 
-    def set_bank(self, bank):
-      bank_pct = int(bank)
-      self.kingdom.set_bank_pct(bank_pct)
+    def set_bank_target(self, bank_target):
+      bank = int(bank_target)
+      self.kingdom.set_bank_target(bank)
       self.kingdom.save()
-      return "Banking {} percent orns per allotment".format(bank_pct)
+      return "Kingdom savings will target {} orns.".format(bank)
+    
+    def set_bank_total(self, bank_total):
+      bank = int(bank_total)
+      self.kingdom.set_bank_total(bank)
+      self.kingdom.save()
+      return "The bank currently holds {} orns.".format(bank)
+    
+    def set_bank_hold(self, bank_hold):
+      bank = int(bank_hold)
+      self.kingdom.set_bank_hold(bank)
+      self.kingdom.save()
+      return "{} orns will be witheld from every allocation when the bank total ({}) is less than the bank target ({}).".format(bank, self.kingdom.bank_total, self.kingdom.bank_target)
     
     def set_channel(self, channel):
       self.kingdom.set_channel(channel)

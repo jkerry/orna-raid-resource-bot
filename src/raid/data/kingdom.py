@@ -21,17 +21,21 @@ class Kingdom:
         result = self.db.kingdoms.find_one({'id': self.kingdom_id})
         if result is not None:
             self.data = result
-        self._load_or_default_bank_pct()
         self._load_or_default_split_allotment()
         self._load_or_default_allotment_distribution()
         self._load_or_default_channel()
         self._load_or_default_command_channel()
         self._load_or_default_allotment_header()
         self._load_or_default_emoji()
+        self._load_or_default_bank_target()
+        self._load_or_default_bank_total()
+        self._load_or_default_bank_hold()
         return self
 
     def save(self):
-        self.data['bank_pct'] = self.bank_pct
+        self.data['bank_target'] = self.bank_target
+        self.data['bank_total'] = self.bank_total
+        self.data['bank_hold'] = self.bank_hold
         self.data['split_allotment'] = self.split_allotment
         self.data['kingdom_id'] = self.kingdom_id
         self.data['kingdom_name'] = self.kingdom_name
@@ -70,9 +74,23 @@ class Kingdom:
         self.needs_persistance = True
         return True
 
-    def set_bank_pct(self, new_bank_pct):
-        if self._bank_pct_is_valid(new_bank_pct):
-            self.bank_pct = new_bank_pct
+    def set_bank_target(self, new_bank_target):
+        if self._bank_target_is_valid(new_bank_target):
+            self.bank_target = new_bank_target
+            self.needs_persistance = True
+            return True
+        return False
+
+    def set_bank_total(self, new_bank_total):
+        if self._bank_total_is_valid(new_bank_total):
+            self.bank_total = new_bank_total
+            self.needs_persistance = True
+            return True
+        return False
+
+    def set_bank_hold(self, new_bank_hold):
+        if self._bank_hold_is_valid(new_bank_hold):
+            self.bank_hold = new_bank_hold
             self.needs_persistance = True
             return True
         return False
@@ -84,10 +102,20 @@ class Kingdom:
             return True
         return False
 
-    def _bank_pct_is_valid(self, bank_pct):
-        return bank_pct is not None and \
-            isinstance(bank_pct, int) and \
-            bank_pct >= 0 and bank_pct <= 100
+    def _bank_target_is_valid(self, bank_target):
+        return bank_target is not None and \
+            isinstance(bank_target, int) and \
+            bank_target >= 0
+
+    def _bank_total_is_valid(self, bank_total):
+        return bank_total is not None and \
+            isinstance(bank_total, int) and \
+            bank_total >= 0
+    
+    def _bank_hold_is_valid(self, bank_hold):
+        return bank_hold is not None and \
+            isinstance(bank_hold, int) and \
+            bank_hold >= 0
 
     def _load_or_default_allotment_header(self):
         if 'allotment_header' not in self.data:
@@ -118,12 +146,24 @@ class Kingdom:
             self.data['channel'] = 'raid_allotments'
             self.needs_persistance = True
         self.channel = self.data['channel']
-
-    def _load_or_default_bank_pct(self):
-        if not ('bank_pct' in self.data and self._bank_pct_is_valid(self.data['bank_pct'])):
-            self.data['bank_pct'] = 10
+    
+    def _load_or_default_bank_target(self):
+        if not ('bank_target' in self.data and self._bank_target_is_valid(self.data['bank_target'])):
+            self.data['bank_target'] = 1000000
             self.needs_persistance = True
-        self.bank_pct = self.data['bank_pct']
+        self.bank_target = self.data['bank_target']
+    
+    def _load_or_default_bank_total(self):
+        if not ('bank_total' in self.data and self._bank_total_is_valid(self.data['bank_total'])):
+            self.data['bank_total'] = 500000
+            self.needs_persistance = True
+        self.bank_total = self.data['bank_total']
+
+    def _load_or_default_bank_hold(self):
+        if not ('bank_hold' in self.data and self._bank_hold_is_valid(self.data['bank_hold'])):
+            self.data['bank_hold'] = 50000
+            self.needs_persistance = True
+        self.bank_hold = self.data['bank_hold']
     
     def _split_allotment_is_valid(self, split_allotment):
         return split_allotment is not None and \
