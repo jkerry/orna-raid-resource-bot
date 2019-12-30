@@ -17,6 +17,7 @@ class MessageParser:
     configure_bank_total_pattern = re.compile(r'configure bank total\s*(\d+)')
     configure_bank_hold_pattern = re.compile(r'configure bank hold\s*(\d+)')
 
+    configure_monthly_cost_pattern = re.compile(r'configure monthly raid cost\s*(\d+)')
     configure_post_allotment_pattern = re.compile(r'post allotment\s*(\d+)')
     configure_split_pattern = re.compile(r'configure split\s*([TtrueFfals]+)')
     allocate_pattern = re.compile(r'allocate\s*(\d+)')
@@ -66,6 +67,9 @@ class MessageParser:
             
             configure command channel :: configure the channel that this bot listens to for commands.  Default is all channels
                 -- example: %raid configure command channel officers
+
+            configure monthly raid cost :: configure the cost of the monthly raid. Default is 4800.
+                -- example: %raid configure monthly raid cost 4800
             
             post allotment :: remove posts from the allotment channel and post a new allotment
                 -- example: %raid post allotment 189000
@@ -79,13 +83,14 @@ class MessageParser:
         allotments = []
         bank_total = kingdom.bank_total
         bank_target = kingdom.bank_target
+        monthly_cost = kingdom.monthly_cost
         bank_hold = kingdom.bank_hold
         allotment_distribution = kingdom.allotment_distribution
         orns_gained = orns - bank_total
         usable_orns = orns_gained
         if bank_total < bank_target:
             usable_orns = usable_orns - bank_hold
-        raid_costs = [910,910,1410,1910,2500,3000,5500,4800]
+        raid_costs = [910,910,1410,1910,2500,3000,5500,monthly_cost]
         if orns_gained < 0 or usable_orns < 0:
             kingdom.set_bank_total(orns)
             kingdom.save()
@@ -193,6 +198,14 @@ class MessageParser:
             else:
                 return 'Unable to parse the command. Expected an orn value ' + \
                 'greater than 0:\n`%raid configure bank total 900000'
+        elif command_text.startswith('configure monthly raid cost'):
+            match = self.configure_monthly_cost_pattern.match(command_text)
+            if match:
+                values = match.groups()
+                return operators.set_monthly_cost(values[0])
+            else:
+                return 'Unable to parse the command. Expected an orn value ' + \
+                'greater than 0:\n`%raid configure monthly raid cost 4800'
         elif command_text.startswith('configure bank total'):
             match = self.configure_bank_total_pattern.match(command_text)
             if match:
