@@ -27,12 +27,14 @@ class Kingdom:
         self._load_or_default_command_channel()
         self._load_or_default_allotment_header()
         self._load_or_default_emoji()
+        self._load_or_default_monthly_cost()
         self._load_or_default_bank_target()
         self._load_or_default_bank_total()
         self._load_or_default_bank_hold()
         return self
 
     def save(self):
+        self.data['monthly_cost'] = self.monthly_cost
         self.data['bank_target'] = self.bank_target
         self.data['bank_total'] = self.bank_total
         self.data['bank_hold'] = self.bank_hold
@@ -74,6 +76,13 @@ class Kingdom:
         self.needs_persistance = True
         return True
 
+    def set_monthly_cost(self, new_monthly_cost):
+        if self._monthly_cost_is_valid(new_monthly_cost):
+            self.monthly_cost = new_monthly_cost
+            self.needs_persistance = True
+            return True
+        return False
+
     def set_bank_target(self, new_bank_target):
         if self._bank_target_is_valid(new_bank_target):
             self.bank_target = new_bank_target
@@ -101,6 +110,11 @@ class Kingdom:
             self.needs_persistance = True
             return True
         return False
+
+    def _monthly_cost_is_valid(self, monthly_cost):
+        return monthly_cost is not None and \
+            isinstance(monthly_cost, int) and \
+            monthly_cost >= 0
 
     def _bank_target_is_valid(self, bank_target):
         return bank_target is not None and \
@@ -146,6 +160,12 @@ class Kingdom:
             self.data['channel'] = 'raid_allotments'
             self.needs_persistance = True
         self.channel = self.data['channel']
+
+    def _load_or_default_monthly_cost(self):
+        if not ('monthly_cost' in self.data and self._monthly_cost_is_valid(self.data['monthly_cost'])):
+            self.data['monthly_cost'] = 4800
+            self.needs_persistance = True
+        self.monthly_cost = self.data['monthly_cost']
     
     def _load_or_default_bank_target(self):
         if not ('bank_target' in self.data and self._bank_target_is_valid(self.data['bank_target'])):

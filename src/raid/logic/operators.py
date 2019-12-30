@@ -58,7 +58,7 @@ class Operators:
       Split allotment: {}
       Reporting Channel: {}
       Command Channel: {}
-      Current Monthly Raid Cost: 4800
+      Current Monthly Raid Cost: {}
       {}
       """.format(
         self.kingdom.kingdom_name,
@@ -68,6 +68,7 @@ class Operators:
         self.kingdom.split_allotment,
         self.kingdom.channel,
         self.kingdom.command_channel,
+        self.kingdom.monthly_cost,
         self._dump_pct_table("Raid allotment Distribution:", self.kingdom.allotment_distribution)
       ))
 
@@ -76,6 +77,12 @@ class Operators:
       self.kingdom.set_bank_target(bank)
       self.kingdom.save()
       return "Kingdom savings will target {} orns.".format(bank)
+
+    def set_monthly_cost(self, monthly_cost):
+      bank = int(monthly_cost)
+      self.kingdom.set_monthly_cost(bank)
+      self.kingdom.save()
+      return "The monthly raid cost for the kingdom is set to {} orns.".format(bank)
     
     def set_bank_total(self, bank_total):
       bank = int(bank_total)
