@@ -9,8 +9,8 @@ class MessageParser:
     configure_channel_pattern = re.compile(r'configure channel\s*(\S+)')
     configure_command_channel_pattern = re.compile(r'configure command channel\s*(\S+)')
     configure_header_pattern = re.compile(r'configure header\s*(.*)')
-    configure_allotment_pattern = re.compile(r'configure allotment\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)')
-    configure_emoji_pattern = re.compile(r'configure emoji\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)')
+    configure_allotment_pattern = re.compile(r'configure allotment\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)')
+    configure_emoji_pattern = re.compile(r'configure emoji\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*(\S+)')
 
     # Bank Commands
     configure_bank_target_pattern = re.compile(r'configure bank target\s*(\d+)')
@@ -45,10 +45,10 @@ class MessageParser:
                 -- example: %raid show configuration
             
             configure allotment :: configures the raid distribution percentages. Monthly raid is last.
-                -- example: %raid configure allotment 0 0 0 0 0 40 50 10
+                -- example: %raid configure allotment 0 0 0 0 0 40 50 0 10
             
             configure emoji :: configures the raid emoji. IDs are unique per server. Monthly raid is last.
-                -- example: %raid configure emoji <:dracon:648761031400882177> <:fomor:648761066666590229> ...
+                -- example: %raid configure emoji :dracon: :fomor: ...
             
             configure bank total :: configures the total held bank orns
                 -- example: %raid configure bank total 1000000
@@ -90,13 +90,13 @@ class MessageParser:
         usable_orns = orns_gained
         if bank_total < bank_target:
             usable_orns = usable_orns - bank_hold
-        raid_costs = [910,910,1410,1910,2500,3000,5500,monthly_cost]
+        raid_costs = [910,910,1410,1910,2500,3000,5500,5500,monthly_cost]
         if orns_gained < 0 or usable_orns < 0:
             kingdom.set_bank_total(orns)
             kingdom.save()
             return [0]*8
 
-        for i in range(8):
+        for i in range(9):
             dist = allotment_distribution[i] / 100.0
             allotments.append(math.floor(dist * usable_orns / raid_costs[i]))
         
@@ -147,10 +147,11 @@ class MessageParser:
             "Balor Elite",
             "King Arthus",
             "Apollyon",
+            "The Morrigan",
             "Monthly Raid"
         ]
         emoji = kingdom.emoji
-        for i in range(8):
+        for i in range(9):
             message_ids.append(await self._send_allotment_and_get_id(msg_channel, "{} {}".format(emoji[i], bosses[i]), allotment[i]))
         return "Allotment Sent!"
 
@@ -175,21 +176,21 @@ class MessageParser:
             return operators.show_configuration()
         elif command_text.startswith('configure allotment'):
             match = self.configure_allotment_pattern.match(command_text)
-            if len(command_text.split()) is 10 and match:
+            if len(command_text.split()) == 11 and match:
                 values = match.groups()
                 return operators.set_allotment(values)
             else:
-                return 'Unable to parse the command. Expected 8 percentage ' + \
+                return 'Unable to parse the command. Expected 9 percentage ' + \
                 'values totaling to 100:\n`%raid configure allotment' + \
-                ' 0 0 0 10 15 25 25 0`'
+                ' 0 0 0 10 15 25 25 0 0`'
         elif command_text.startswith('configure emoji'):
             match = self.configure_emoji_pattern.match(command_text)
-            if len(command_text.split()) is 10 and match:
+            if len(command_text.split()) == 11 and match:
                 values = match.groups()
                 return operators.set_emoji(values)
             else:
-                return 'Unable to parse the command. Expected 8 emoji tags.' + \
-                    '%raid configure emoji <:dracon:648761031400882177> <:fomor:648761066666590229> ...'
+                return 'Unable to parse the command. Expected 9 emoji tags.' + \
+                    '%raid configure emoji :dracon: :fomor: ...'
         elif command_text.startswith('configure bank target'):
             match = self.configure_bank_target_pattern.match(command_text)
             if match:

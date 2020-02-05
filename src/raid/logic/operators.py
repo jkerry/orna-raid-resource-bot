@@ -35,6 +35,8 @@ class Operators:
       +--------------------+----------------------+
       | Apollyon           |          {}          |
       +--------------------+----------------------+
+      | The Morrigan       |          {}          |
+      +--------------------+----------------------+
       | Monthly Raid       |          {}          |
       +--------------------+----------------------+
       ```
@@ -47,7 +49,8 @@ class Operators:
           allotments[4].zfill(2),
           allotments[5].zfill(2),
           allotments[6].zfill(2),
-          allotments[7].zfill(2)))
+          allotments[7].zfill(2),
+          allotments[8].zfill(2)))
 
     def show_configuration(self):
       return inspect.cleandoc("""

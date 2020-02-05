@@ -139,13 +139,13 @@ class Kingdom:
 
     def _load_or_default_allotment_distribution(self):
         if not ('allotment_distribution' in self.data and self._allotment_distribution_is_valid(self.data['allotment_distribution'])):
-            self.data['allotment_distribution'] = [0,0,0,0,0,40,50,10]
+            self.data['allotment_distribution'] = [0,0,0,0,0,40,50,0,10]
             self.needs_persistance = True
         self.allotment_distribution = self.data['allotment_distribution']
     
     def _load_or_default_emoji(self):
         if not ('emoji' in self.data):
-            self.data['emoji'] = [":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":calendar:"]
+            self.data['emoji'] = [":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":calendar:"]
             self.needs_persistance = True
         self.emoji = self.data['emoji']
 
@@ -197,7 +197,7 @@ class Kingdom:
 
     def _allotment_distribution_is_valid(self, allotment_pcts):
         total = 0
-        if len(allotment_pcts) != 8:
+        if len(allotment_pcts) != 9:
             return False
         for value in allotment_pcts:
             total += int(value)
