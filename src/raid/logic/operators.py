@@ -97,7 +97,7 @@ class Operators:
       bank = int(bank_hold)
       self.kingdom.set_bank_hold(bank)
       self.kingdom.save()
-      return "{} orns will be witheld from every allocation when the bank total ({}) is less than the bank target ({}).".format(bank, self.kingdom.bank_total, self.kingdom.bank_target)
+      return "{} orns will be witheld from every allocation when the bank total ({}) is less than the bank target ({}). If the hold is negative then it will be deducted regardless of the bank target.".format(bank, self.kingdom.bank_total, self.kingdom.bank_target)
     
     def set_channel(self, channel):
       self.kingdom.set_channel(channel)
