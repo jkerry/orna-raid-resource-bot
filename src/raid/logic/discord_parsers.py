@@ -15,7 +15,7 @@ class MessageParser:
     # Bank Commands
     configure_bank_target_pattern = re.compile(r'configure bank target\s*(\d+)')
     configure_bank_total_pattern = re.compile(r'configure bank total\s*(\d+)')
-    configure_bank_hold_pattern = re.compile(r'configure bank hold\s*(\d+)')
+    configure_bank_hold_pattern = re.compile(r'configure bank hold\s*(-?\d+)')
 
     configure_monthly_cost_pattern = re.compile(r'configure monthly raid cost\s*(\d+)')
     configure_post_allotment_pattern = re.compile(r'post allotment\s*(\d+)')
