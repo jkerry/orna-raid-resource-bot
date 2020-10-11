@@ -94,7 +94,7 @@ class MessageParser:
         if orns_gained < 0 or usable_orns < 0:
             kingdom.set_bank_total(orns)
             kingdom.save()
-            return [0]*8
+            return [0]*9
 
         for i in range(9):
             dist = allotment_distribution[i] / 100.0
