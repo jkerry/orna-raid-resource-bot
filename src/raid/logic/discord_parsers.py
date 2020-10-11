@@ -151,6 +151,10 @@ class MessageParser:
             "Monthly Raid"
         ]
         emoji = kingdom.emoji
+        delim = " | "
+        print(delim.join(emoji))
+        print(delim.join(bosses))
+        print(delim.join(str(x) for x in allotment))
         for i in range(9):
             message_ids.append(await self._send_allotment_and_get_id(msg_channel, "{} {}".format(emoji[i], bosses[i]), allotment[i]))
         return "Allotment Sent!"
