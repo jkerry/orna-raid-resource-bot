@@ -90,7 +90,7 @@ class MessageParser:
         usable_orns = orns_gained
         if bank_total < bank_target or bank_hold < 0:
             usable_orns = usable_orns - bank_hold
-        raid_costs = [910,910,1410,1910,2500,3000,5500,10410,monthly_cost]
+        raid_costs = [840,840,1340,1840,2340,2840,5340,10340,monthly_cost]
         if orns_gained < 0 or usable_orns < 0:
             kingdom.set_bank_total(orns)
             kingdom.save()
